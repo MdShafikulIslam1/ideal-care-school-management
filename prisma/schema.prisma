@@ -61,7 +61,7 @@ model Student {
 
 model Class {
   id        String     @id @default(uuid())
-  title     Class_Name
+  title     Class_Name @unique @default(PLAY)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   students  Student[]

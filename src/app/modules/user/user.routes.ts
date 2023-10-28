@@ -16,11 +16,11 @@ router.post(
 //   UserController.createFaculy
 // );
 
-// router.post(
-//   '/create-admin',
-//   validateRequest(UserValidation.createAdminZodSchema),
-//   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-//   UserController.createAdmin
-// );
+router.post(
+  '/create-admin',
+  //   validateRequest(UserValidation.createAdminZodSchema),
+  //   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.createAdmin
+);
 
 export const UserRoutes = router;
