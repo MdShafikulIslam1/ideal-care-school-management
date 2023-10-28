@@ -9,3 +9,130 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @unique
+  password  String
+  role      String
+  studentId String?  @unique
+  student   Student? @relation(fields: [studentId], references: [id])
+  adminId   String?  @unique
+  admin     Admin?   @relation(fields: [adminId], references: [id])
+  teacherId String?  @unique
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+}
+
+model Student {
+  id                     String               @id @unique
+  firstName              String
+  lastName               String
+  contactNo              String
+  emergencyContactNo     String
+  classRole              Int?
+  fatherName             String
+  fatherContactNo        String
+  fatherOccupation       String
+  motherName             String
+  motherContactNo        String
+  motherOccupation       String
+  presentAddress         String
+  permanentAddress       String
+  dateOfBirth            String
+  bloodGroup             String
+  profileImage           String?
+  isPasswordChange       Boolean              @default(false)
+  passwordChangeDate     DateTime?
+  localGuardianName      String
+  localGuardianContactNo String
+  department             Department?          @default(SCIENCE)
+  residentialCategory    ResidentialCategory? @default(NON_RESIDENT)
+  classId                String
+  class                  Class                @relation(fields: [classId], references: [id])
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  user                   User?
+
+  @@map("student")
+}
+
+model Class {
+  id        String    @id @default(uuid())
+  title     String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  students  Student[]
+  teachers  Teacher[]
+
+  @@map("class")
+}
+
+model Admin {
+  id                     String               @id @unique
+  firstName              String
+  lastName               String
+  contactNo              String
+  emergencyContactNo     String
+  presentAddress         String
+  permanentAddress       String
+  dateOfBirth            String
+  bloodGroup             String
+  profileImage           String?
+  isPasswordChange       Boolean              @default(false)
+  passwordChangeDate     DateTime?
+  managementDepartmentId String
+  managementDepartment   ManagementDepartment @relation(fields: [managementDepartmentId], references: [id])
+  designation            String
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  user                   User?
+
+  @@map("admin")
+}
+
+model ManagementDepartment {
+  id        String   @id @default(uuid())
+  title     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  admins    Admin[]
+
+  @@map("management_department")
+}
+
+model Teacher {
+  id                       String    @id @unique
+  firstName                String
+  lastName                 String
+  contactNo                String
+  emergencyContactNo       String
+  presentAddress           String
+  permanentAddress         String
+  dateOfBirth              String
+  bloodGroup               String
+  profileImage             String?
+  isPasswordChange         Boolean   @default(false)
+  passwordChangeDate       DateTime?
+  classTeacherId           String
+  educationalQualification Json
+  class                    Class     @relation(fields: [classTeacherId], references: [id])
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  user                     User?
+
+  @@map("teacher")
+}
+
+enum Department {
+  SCIENCE
+  COMMERCE
+  HUMANITIES
+}
+
+enum ResidentialCategory {
+  RESIDENT
+  NON_RESIDENT
+}
