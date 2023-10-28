@@ -11,23 +11,23 @@ datasource db {
 }
 
 model User {
-  id        String   @id @unique
+  id        String    @id @unique
   password  String
-  role      String
-  studentId String?  @unique
-  student   Student? @relation(fields: [studentId], references: [id])
-  adminId   String?  @unique
-  admin     Admin?   @relation(fields: [adminId], references: [id])
-  teacherId String?  @unique
-  teacher   Teacher? @relation(fields: [teacherId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      User_Role @default(STUDENT)
+  studentId String?   @unique
+  student   Student?  @relation(fields: [studentId], references: [id])
+  adminId   String?   @unique
+  admin     Admin?    @relation(fields: [adminId], references: [id])
+  teacherId String?   @unique
+  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("user")
 }
 
 model Student {
-  id                     String               @id @unique
+  id                     String              @id @unique
   firstName              String
   lastName               String
   contactNo              String
@@ -44,26 +44,26 @@ model Student {
   dateOfBirth            String
   bloodGroup             String
   profileImage           String?
-  isPasswordChange       Boolean              @default(false)
+  isPasswordChange       Boolean             @default(false)
   passwordChangeDate     DateTime?
   localGuardianName      String
   localGuardianContactNo String
-  department             Department?          @default(SCIENCE)
-  residentialCategory    ResidentialCategory? @default(NON_RESIDENT)
+  department             Department?         @default(SCIENCE)
+  residentialCategory    ResidentialCategory @default(NON_RESIDENT)
   classId                String
-  class                  Class                @relation(fields: [classId], references: [id])
-  createdAt              DateTime             @default(now())
-  updatedAt              DateTime             @updatedAt
+  class                  Class               @relation(fields: [classId], references: [id])
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
   user                   User?
 
   @@map("student")
 }
 
 model Class {
-  id        String    @id @default(uuid())
-  title     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String     @id @default(uuid())
+  title     Class_Name
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   students  Student[]
   teachers  Teacher[]
 
@@ -135,4 +135,26 @@ enum Department {
 enum ResidentialCategory {
   RESIDENT
   NON_RESIDENT
+}
+
+enum User_Role {
+  STUDENT
+  TEACHER
+  ADMIN
+  GUARDIAN
+}
+
+enum Class_Name {
+  PLAY
+  NURSERY
+  ONE
+  TWO
+  THREE
+  FOUR
+  FIVE
+  SIX
+  SEVEN
+  EIGHT
+  NINE
+  TEN
 }
