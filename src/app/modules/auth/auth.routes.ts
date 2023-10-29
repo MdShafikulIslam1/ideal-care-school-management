@@ -20,7 +20,7 @@ router.post(
     User_Role.STUDENT,
     User_Role.GUARDIAN
   ),
-  AuthController.loginUser
+  AuthController.changePassword
 );
 
 export const AuthRoutes = router;
