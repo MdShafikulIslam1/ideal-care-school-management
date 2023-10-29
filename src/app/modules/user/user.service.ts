@@ -15,6 +15,7 @@ import {
 import prisma from '../../../shared/prisma';
 import ApiError from '../../../error/ApiError';
 import httpStatus from 'http-status';
+import bcrypt from 'bcrypt';
 
 const createStudent = async (student: Student, user: User): Promise<User> => {
   const { classId } = student;
@@ -30,8 +31,17 @@ const createStudent = async (student: Student, user: User): Promise<User> => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid class Name');
   }
   // If password is not given,set default password
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_number)
+  );
+
   if (!user.password) {
-    user.password = config.default_pass as string;
+    user.password = await bcrypt.hash(
+      config.default_pass as string,
+      Number(config.bcrypt_salt_number)
+    );
+    config.default_pass as string;
   }
   // set role
   user.role = User_Role.STUDENT;
@@ -71,8 +81,17 @@ const createStudent = async (student: Student, user: User): Promise<User> => {
 };
 const createAdmin = async (admin: Admin, user: User): Promise<User> => {
   // If password is not given,set default password
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_number)
+  );
+
   if (!user.password) {
-    user.password = config.default_pass as string;
+    user.password = await bcrypt.hash(
+      config.default_pass as string,
+      Number(config.bcrypt_salt_number)
+    );
+    config.default_pass as string;
   }
   // set role
   user.role = User_Role.ADMIN;
@@ -102,8 +121,17 @@ const createAdmin = async (admin: Admin, user: User): Promise<User> => {
 };
 const createTeacher = async (teacher: Teacher, user: User): Promise<User> => {
   // If password is not given,set default password
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_number)
+  );
+
   if (!user.password) {
-    user.password = config.default_pass as string;
+    user.password = await bcrypt.hash(
+      config.default_pass as string,
+      Number(config.bcrypt_salt_number)
+    );
+    config.default_pass as string;
   }
   // set role
   user.role = User_Role.TEACHER;
@@ -132,8 +160,12 @@ const createTeacher = async (teacher: Teacher, user: User): Promise<User> => {
   return result;
 };
 const createGuardian = async (params: Guardian, user: User): Promise<User> => {
-  const { childId, childPassword, phoneNumber, password } = params;
-  user.password = password;
+  const { childId, childPassword, phoneNumber } = params;
+  params.password = await bcrypt.hash(
+    params.password,
+    Number(config.bcrypt_salt_number)
+  );
+  user.password = params.password;
   user.role = User_Role.GUARDIAN;
   const isExistStudent = await prisma.user.findFirst({
     where: {
