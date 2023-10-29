@@ -11,17 +11,19 @@ datasource db {
 }
 
 model User {
-  id        String    @id @unique
-  password  String
-  role      User_Role @default(STUDENT)
-  studentId String?   @unique
-  student   Student?  @relation(fields: [studentId], references: [id])
-  adminId   String?   @unique
-  admin     Admin?    @relation(fields: [adminId], references: [id])
-  teacherId String?   @unique
-  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String    @id @unique
+  password   String
+  role       User_Role @default(STUDENT)
+  studentId  String?   @unique
+  student    Student?  @relation(fields: [studentId], references: [id])
+  adminId    String?   @unique
+  admin      Admin?    @relation(fields: [adminId], references: [id])
+  teacherId  String?   @unique
+  teacher    Teacher?  @relation(fields: [teacherId], references: [id])
+  guardianId String?   @unique
+  guardian   Guardian? @relation(fields: [guardianId], references: [phoneNumber])
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("user")
 }
@@ -48,6 +50,7 @@ model Student {
   passwordChangeDate     DateTime?
   localGuardianName      String
   localGuardianContactNo String
+  isActive               Boolean             @default(true)
   department             Department?         @default(SCIENCE)
   residentialCategory    ResidentialCategory @default(NON_RESIDENT)
   classId                String
@@ -55,17 +58,20 @@ model Student {
   createdAt              DateTime            @default(now())
   updatedAt              DateTime            @updatedAt
   user                   User?
+  guardians              Guardian[]
 
   @@map("student")
 }
 
 model Class {
-  id        String     @id @default(uuid())
-  title     Class_Name @unique @default(PLAY)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  students  Student[]
-  teachers  Teacher[]
+  id              String     @id @default(uuid())
+  title           Class_Name @unique @default(PLAY)
+  maxCapacity     Int        @default(30)
+  admittedStudent Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  students        Student[]
+  teachers        Teacher[]
 
   @@map("class")
 }
@@ -83,6 +89,7 @@ model Admin {
   profileImage           String?
   isPasswordChange       Boolean              @default(false)
   passwordChangeDate     DateTime?
+  isActive               Boolean              @default(true)
   managementDepartmentId String
   managementDepartment   ManagementDepartment @relation(fields: [managementDepartmentId], references: [id])
   designation            String
@@ -116,14 +123,30 @@ model Teacher {
   profileImage             String?
   isPasswordChange         Boolean   @default(false)
   passwordChangeDate       DateTime?
+  isActive                 Boolean   @default(true)
+  educationalQualification String
   classTeacherId           String
-  educationalQualification Json
   class                    Class     @relation(fields: [classTeacherId], references: [id])
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   user                     User?
 
   @@map("teacher")
+}
+
+model Guardian {
+  id            String   @id @default(uuid())
+  phoneNumber   String   @unique
+  password      String
+  profileImage  String?
+  childId       String
+  child         Student  @relation(fields: [childId], references: [id])
+  childPassword String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User?
+
+  @@map("guardian")
 }
 
 enum Department {

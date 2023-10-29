@@ -26,8 +26,31 @@ const createAdmin = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createTeacher = catchAsync(async (req, res) => {
+  const { teacher, ...userData } = req.body;
+  const result = await UserService.createTeacher(teacher, userData);
+
+  sendResponse<User>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'teacher created successfully!',
+    data: result,
+  });
+});
+const createGuardian = catchAsync(async (req, res) => {
+  const { guardian, ...userData } = req.body;
+  const result = await UserService.createGuardian(guardian, userData);
+  sendResponse<User>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Guardian created successfully!',
+    data: result,
+  });
+});
 
 export const UserController = {
   createStudent,
   createAdmin,
+  createTeacher,
+  createGuardian,
 };

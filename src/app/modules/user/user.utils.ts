@@ -42,10 +42,32 @@ export const generateAdminId = async (): Promise<string> => {
   const currentId =
     (await findLastAdminId()) || (0).toString().padStart(5, '0'); //00000
   //increment by 1
-  console.log('last id', currentId);
   let incrementedId = (parseInt(currentId) + 1).toString().padStart(5, '0');
   //20 25
   incrementedId = `A-${incrementedId}`;
+
+  return incrementedId;
+};
+export const findLastTeacherId = async (): Promise<string | undefined> => {
+  const lastTeacher = await prisma.user.findFirst({
+    where: {
+      role: User_Role.TEACHER,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return lastTeacher?.id ? lastTeacher.id.substring(2) : undefined;
+};
+
+export const generateTeacherId = async (): Promise<string> => {
+  const currentId =
+    (await findLastTeacherId()) || (0).toString().padStart(5, '0'); //00000
+  //increment by 1
+  let incrementedId = (parseInt(currentId) + 1).toString().padStart(5, '0');
+  //20 25
+  incrementedId = `T-${incrementedId}`;
 
   return incrementedId;
 };

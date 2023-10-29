@@ -9,12 +9,18 @@ router.post(
   UserController.createStudent
 );
 
-// router.post(
-//   '/create-faculty',
-//   validateRequest(UserValidation.createFacultyZodSchema),
-//   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-//   UserController.createFaculy
-// );
+router.post(
+  '/create-teacher',
+  // validateRequest(UserValidation.createFacultyZodSchema),
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.createTeacher
+);
+router.post(
+  '/create-guardian',
+  // validateRequest(UserValidation.createFacultyZodSchema),
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.createGuardian
+);
 
 router.post(
   '/create-admin',
