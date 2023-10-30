@@ -47,10 +47,21 @@ const createGuardian = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const createSuperAdmin = catchAsync(async (req, res) => {
+  const { superAdmin, ...userData } = req.body;
+  const result = await UserService.createSuperAdmin(superAdmin, userData);
+  sendResponse<User>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Super admin created successfully!',
+    data: result,
+  });
+});
 
 export const UserController = {
   createStudent,
   createAdmin,
   createTeacher,
   createGuardian,
+  createSuperAdmin,
 };

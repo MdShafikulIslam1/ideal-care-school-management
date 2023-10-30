@@ -11,21 +11,23 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @unique
+  id                 String      @id @unique
   password           String
-  role               User_Role @default(STUDENT)
-  isPasswordChange   Boolean   @default(false)
+  role               User_Role   @default(student)
+  isPasswordChange   Boolean     @default(false)
   passwordChangeDate DateTime?
-  studentId          String?   @unique
-  student            Student?  @relation(fields: [studentId], references: [id])
-  adminId            String?   @unique
-  admin              Admin?    @relation(fields: [adminId], references: [id])
-  teacherId          String?   @unique
-  teacher            Teacher?  @relation(fields: [teacherId], references: [id])
-  guardianId         String?   @unique
-  guardian           Guardian? @relation(fields: [guardianId], references: [phoneNumber])
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  studentId          String?     @unique
+  student            Student?    @relation(fields: [studentId], references: [id])
+  superAdminId       String?     @unique
+  superAdmin         SuperAdmin? @relation(fields: [superAdminId], references: [id])
+  adminId            String?     @unique
+  admin              Admin?      @relation(fields: [adminId], references: [id])
+  teacherId          String?     @unique
+  teacher            Teacher?    @relation(fields: [teacherId], references: [id])
+  guardianId         String?     @unique
+  guardian           Guardian?   @relation(fields: [guardianId], references: [phoneNumber])
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 
   @@map("user")
 }
@@ -75,6 +77,27 @@ model Class {
   teachers        Teacher[]
 
   @@map("class")
+}
+
+model SuperAdmin {
+  id                 String   @id @unique
+  firstName          String
+  lastName           String
+  gender             Gender   @default(MALE)
+  contactNo          String
+  emergencyContactNo String
+  presentAddress     String
+  permanentAddress   String
+  dateOfBirth        String
+  bloodGroup         String
+  profileImage       String?
+  isActive           Boolean  @default(true)
+  designation        String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User?
+
+  @@map("super_admin")
 }
 
 model Admin {
@@ -161,10 +184,11 @@ enum ResidentialCategory {
 }
 
 enum User_Role {
-  STUDENT
-  TEACHER
-  ADMIN
-  GUARDIAN
+  student
+  teacher
+  admin
+  guardian
+  super_admin
 }
 
 enum Class_Name {

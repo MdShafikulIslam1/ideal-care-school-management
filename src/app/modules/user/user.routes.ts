@@ -28,5 +28,11 @@ router.post(
   //   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   UserController.createAdmin
 );
+router.post(
+  '/create-super-admin',
+  //   validateRequest(UserValidation.createAdminZodSchema),
+  //   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.createSuperAdmin
+);
 
 export const UserRoutes = router;

@@ -2,6 +2,7 @@ import {
   Admin,
   Guardian,
   Student,
+  SuperAdmin,
   Teacher,
   User,
   User_Role,
@@ -10,6 +11,7 @@ import config from '../../../config';
 import {
   generateAdminId,
   generateStudentId,
+  generateSuperAdminId,
   generateTeacherId,
 } from './user.utils';
 import prisma from '../../../shared/prisma';
@@ -44,7 +46,7 @@ const createStudent = async (student: Student, user: User): Promise<User> => {
     config.default_pass as string;
   }
   // set role
-  user.role = User_Role.STUDENT;
+  user.role = User_Role.student;
 
   const result = await prisma.$transaction(async ts => {
     const id = await generateStudentId();
@@ -79,6 +81,52 @@ const createStudent = async (student: Student, user: User): Promise<User> => {
   });
   return result;
 };
+const createSuperAdmin = async (
+  superAdmin: SuperAdmin,
+  user: User
+): Promise<User> => {
+  // If password is not given,set default password
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_number)
+  );
+
+  if (!user.password) {
+    user.password = await bcrypt.hash(
+      config.default_pass as string,
+      Number(config.bcrypt_salt_number)
+    );
+    config.default_pass as string;
+  }
+  // set role
+  user.role = User_Role.super_admin;
+
+  const result = await prisma.$transaction(async ts => {
+    const id = await generateSuperAdminId();
+    // set custom id into both  student & user
+    user.id = id;
+    superAdmin.id = id;
+    const newAdmin = await ts.superAdmin.create({
+      data: superAdmin,
+    });
+
+    if (!newAdmin) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Failed to create Super Admin'
+      );
+    }
+    user.superAdminId = newAdmin?.id;
+    const newUser = await ts.user.create({
+      data: user,
+      include: {
+        superAdmin: true,
+      },
+    });
+    return newUser;
+  });
+  return result;
+};
 const createAdmin = async (admin: Admin, user: User): Promise<User> => {
   // If password is not given,set default password
   user.password = await bcrypt.hash(
@@ -94,7 +142,7 @@ const createAdmin = async (admin: Admin, user: User): Promise<User> => {
     config.default_pass as string;
   }
   // set role
-  user.role = User_Role.ADMIN;
+  user.role = User_Role.admin;
 
   const result = await prisma.$transaction(async ts => {
     const id = await generateAdminId();
@@ -134,7 +182,7 @@ const createTeacher = async (teacher: Teacher, user: User): Promise<User> => {
     config.default_pass as string;
   }
   // set role
-  user.role = User_Role.TEACHER;
+  user.role = User_Role.teacher;
 
   const result = await prisma.$transaction(async ts => {
     const id = await generateTeacherId();
@@ -166,7 +214,7 @@ const createGuardian = async (params: Guardian, user: User): Promise<User> => {
     Number(config.bcrypt_salt_number)
   );
   user.password = params.password;
-  user.role = User_Role.GUARDIAN;
+  user.role = User_Role.guardian;
   const isExistStudent = await prisma.user.findFirst({
     where: {
       student: {
@@ -203,6 +251,7 @@ const createGuardian = async (params: Guardian, user: User): Promise<User> => {
 
 export const UserService = {
   createStudent,
+  createSuperAdmin,
   createAdmin,
   createTeacher,
   createGuardian,
