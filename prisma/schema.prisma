@@ -62,19 +62,22 @@ model Student {
   updatedAt              DateTime            @updatedAt
   user                   User?
   guardians              Guardian[]
+  subjectMarks           subjectMark[]
 
   @@map("student")
 }
 
 model Class {
-  id              String     @id @default(uuid())
-  title           Class_Name @unique @default(PLAY)
-  maxCapacity     Int        @default(30)
-  admittedStudent Int        @default(0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id              String        @id @default(uuid())
+  title           Class_Name    @unique @default(PLAY)
+  maxCapacity     Int           @default(30)
+  admittedStudent Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   students        Student[]
   teachers        Teacher[]
+  subjects        Subject[]
+  subjectMarks    subjectMark[]
 
   @@map("class")
 }
@@ -134,7 +137,7 @@ model ManagementDepartment {
 }
 
 model Teacher {
-  id                       String   @id @unique
+  id                       String           @id @unique
   firstName                String
   lastName                 String
   gender                   Gender
@@ -145,13 +148,14 @@ model Teacher {
   dateOfBirth              String
   bloodGroup               String
   profileImage             String?
-  isActive                 Boolean  @default(true)
+  isActive                 Boolean          @default(true)
   educationalQualification String
   classTeacherId           String
-  class                    Class    @relation(fields: [classTeacherId], references: [id])
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  class                    Class            @relation(fields: [classTeacherId], references: [id])
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
   user                     User?
+  subjectTeachers          SubjectTeacher[]
 
   @@map("teacher")
 }
@@ -170,6 +174,60 @@ model Guardian {
   user          User?
 
   @@map("guardian")
+}
+
+model Subject {
+  id              String           @id @default(uuid())
+  title           String
+  code            String           @unique
+  classId         String
+  class           Class            @relation(fields: [classId], references: [id])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  subjectTeachers SubjectTeacher[]
+  subjectMarks    subjectMark[]
+
+  @@unique([title, code])
+  @@map("subject")
+}
+
+model SubjectTeacher {
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([subjectId, teacherId])
+  @@map("subject_teacher")
+}
+
+model subjectMark {
+  id        String    @id @default(uuid())
+  classId   String
+  class     Class     @relation(fields: [classId], references: [id])
+  studentId String
+  student   Student   @relation(fields: [studentId], references: [id])
+  subjectId String
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  marks     Int?
+  grade     String?
+  point     Float?    @default(0.00)
+  examType  ExamType?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([classId, studentId, subjectId, examType])
+  @@map("subject_mark")
+}
+
+enum ExamType {
+  FIRST_SEMESTER
+  SECOND_SEMESTER
+  THIRD_SEMESTER
+  FINAL
 }
 
 enum Department {

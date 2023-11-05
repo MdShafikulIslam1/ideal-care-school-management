@@ -46,9 +46,31 @@ const updateOne = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const assignSubjects = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await TeacherService.assignSubjects(id, req.body.subjects);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Subject Teacher assigned successfully',
+    data: result,
+  });
+});
+const removeSubjects = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await TeacherService.removeSubjects(id, req.body.subjects);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Subject Teacher removes successfully',
+    data: result,
+  });
+});
 export const TeacherController = {
   getAll,
   getSingle,
   deleteOne,
   updateOne,
+  assignSubjects,
+  removeSubjects,
 };

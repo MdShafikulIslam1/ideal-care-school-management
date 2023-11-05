@@ -1,4 +1,4 @@
-import { Prisma, Teacher, User } from '@prisma/client';
+import { Prisma, SubjectTeacher, Teacher, User } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelpers';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/paginationOptions';
@@ -119,9 +119,57 @@ const updateOne = async (
   });
   return result;
 };
+const assignSubjects = async (
+  id: string,
+  payload: string[]
+): Promise<SubjectTeacher[]> => {
+  await prisma.subjectTeacher.createMany({
+    data: payload.map(subjectId => ({
+      teacherId: id,
+      subjectId: subjectId,
+    })),
+  });
+
+  const assignCoursesData = await prisma.subjectTeacher.findMany({
+    where: {
+      teacherId: id,
+    },
+    include: {
+      subject: true,
+    },
+  });
+
+  return assignCoursesData;
+};
+const removeSubjects = async (
+  id: string,
+  payload: string[]
+): Promise<SubjectTeacher[]> => {
+  await prisma.subjectTeacher.deleteMany({
+    where: {
+      teacherId: id,
+      subjectId: {
+        in: payload,
+      },
+    },
+  });
+
+  const assignCoursesData = await prisma.subjectTeacher.findMany({
+    where: {
+      teacherId: id,
+    },
+    include: {
+      subject: true,
+    },
+  });
+
+  return assignCoursesData;
+};
 export const TeacherService = {
   getAll,
   getSingle,
   deleteOne,
   updateOne,
+  assignSubjects,
+  removeSubjects,
 };
