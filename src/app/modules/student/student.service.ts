@@ -1,4 +1,4 @@
-import { Prisma, Student, User } from '@prisma/client';
+import { Prisma, Student, User, ExamType } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelpers';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/paginationOptions';
@@ -7,6 +7,8 @@ import { IStudentFilterableFields } from './student.interface';
 import { studentSearchableFields } from './student.constant';
 import httpStatus from 'http-status';
 import ApiError from '../../../error/ApiError';
+import { JwtPayload } from 'jsonwebtoken';
+import { getGradeFromPoint } from '../subjectMark/subjectMark.utils';
 
 const getAll = async (
   filters: IStudentFilterableFields,
@@ -119,9 +121,64 @@ const updateOne = async (
   });
   return result;
 };
+const getMyResult = async (
+  userId: JwtPayload | null | string,
+  query: Record<string, unknown>
+) => {
+  const isStudentExist = await prisma.user.findFirst({
+    where: {
+      studentId: userId as string,
+    },
+    include: {
+      student: {
+        include: {
+          class: true,
+        },
+      },
+    },
+  });
+  // console.log(isStudentExist);
+  if (!isStudentExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'You are not Valid Student');
+  }
+  const isExistResult = await prisma.subjectMark.findMany({
+    where: {
+      classId: isStudentExist?.student?.class?.id,
+      studentId: isStudentExist?.id,
+      examType: query?.examType as ExamType,
+    },
+  });
+  if (isExistResult?.length < 1) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'The result not found');
+  }
+
+  const initialTotals = {
+    totalFullMarks: 0,
+    totalMarks: 0,
+    totalPoints: 0,
+  };
+
+  const totals = isExistResult.reduce((accumulator, item) => {
+    accumulator.totalFullMarks += item.fullMarks ?? 0;
+    accumulator.totalMarks += item.marks ?? 0;
+    accumulator.totalPoints += item.point ?? 0;
+    return accumulator;
+  }, initialTotals);
+
+  const result = {
+    result: isExistResult,
+    totalFullMarks: totals?.totalFullMarks,
+    totalObtainMarks: totals?.totalMarks,
+    point: totals.totalPoints / isExistResult.length,
+    grade: getGradeFromPoint(totals.totalPoints / isExistResult.length),
+  };
+  return result;
+};
+
 export const StudentService = {
   getAll,
   getSingle,
   deleteOne,
   updateOne,
+  getMyResult,
 };

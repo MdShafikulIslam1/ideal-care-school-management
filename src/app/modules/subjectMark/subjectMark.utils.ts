@@ -1,4 +1,5 @@
-const getGradeFromMarks = (marks: number) => {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const getGradeFromMarks = (marks: number) => {
   let result = {
     grade: '',
     point: 0,
@@ -42,6 +43,64 @@ const getGradeFromMarks = (marks: number) => {
 
   return result;
 };
-export const SubjectMarkUtils = {
-  getGradeFromMarks,
+
+export const getGradeFromPoint = (point: number) => {
+  let result = '';
+
+  if (point === 0) {
+    result = 'F';
+  } else if (point === 2.0) {
+    result = 'D';
+  } else if (point === 2.5) {
+    result = 'C';
+  } else if (point === 3.0) {
+    result = 'B';
+  } else if (point === 3.5) {
+    result = 'A-';
+  } else if (point === 4.0) {
+    result = 'A';
+  } else if (point === 5.0) {
+    result = 'A+';
+  }
+
+  return result;
 };
+
+export const groupByClassStudentExamType = (data: any) => {
+  const groupData = data.reduce((result: any, item: any) => {
+    const { classId, studentId, examType } = item;
+    const existingGroup = result.find(
+      (group: any) =>
+        group.classId === classId &&
+        group.studentId === studentId &&
+        group.examType === examType
+    );
+
+    if (existingGroup) {
+      existingGroup.results.push(item);
+    } else {
+      result.push({
+        classId,
+        studentId,
+        examType,
+        results: [item],
+      });
+    }
+
+    return result;
+  }, []);
+
+  return groupData;
+};
+
+// import { PrismaClient } from '@prisma/client';
+
+// const prisma = new PrismaClient();
+
+// export const groupByClassStudentExamType = async () => {
+//   const groupedData = await prisma.subjectMark.groupBy({
+//     by: ['classId', 'studentId', 'examType'],
+//   });
+
+//   return groupedData;
+// };

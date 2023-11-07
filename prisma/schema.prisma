@@ -212,6 +212,7 @@ model subjectMark {
   student   Student   @relation(fields: [studentId], references: [id])
   subjectId String
   subject   Subject   @relation(fields: [subjectId], references: [id])
+  fullMarks Int?      @default(100)
   marks     Int?
   grade     String?
   point     Float?    @default(0.00)
