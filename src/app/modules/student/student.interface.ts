@@ -6,3 +6,10 @@ export type IStudentFilterableFields = {
   email?: string;
   gender?: string;
 };
+
+export type IStudentResultFilterableFields = {
+  searchTerm?: string;
+  classId?: string;
+  examType?: string;
+  year?: string;
+};

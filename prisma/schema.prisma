@@ -62,22 +62,22 @@ model Student {
   updatedAt              DateTime            @updatedAt
   user                   User?
   guardians              Guardian[]
-  subjectMarks           subjectMark[]
+  studentResults         StudentResult[]
 
   @@map("student")
 }
 
 model Class {
-  id              String        @id @default(uuid())
-  title           Class_Name    @unique @default(PLAY)
-  maxCapacity     Int           @default(30)
-  admittedStudent Int           @default(0)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id              String          @id @default(uuid())
+  title           Class_Name      @unique @default(PLAY)
+  maxCapacity     Int             @default(30)
+  admittedStudent Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
   students        Student[]
   teachers        Teacher[]
   subjects        Subject[]
-  subjectMarks    subjectMark[]
+  studentResults  StudentResult[]
 
   @@map("class")
 }
@@ -185,7 +185,7 @@ model Subject {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   subjectTeachers SubjectTeacher[]
-  subjectMarks    subjectMark[]
+  subjectMarks    SubjectMarks[]
 
   @@unique([title, code])
   @@map("subject")
@@ -204,24 +204,36 @@ model SubjectTeacher {
   @@map("subject_teacher")
 }
 
-model subjectMark {
-  id        String    @id @default(uuid())
-  classId   String
-  class     Class     @relation(fields: [classId], references: [id])
-  studentId String
-  student   Student   @relation(fields: [studentId], references: [id])
-  subjectId String
-  subject   Subject   @relation(fields: [subjectId], references: [id])
-  fullMarks Int?      @default(100)
-  marks     Int?
-  grade     String?
-  point     Float?    @default(0.00)
-  examType  ExamType?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model StudentResult {
+  id           String         @id @default(uuid())
+  classId      String
+  class        Class          @relation(fields: [classId], references: [id])
+  studentId    String
+  student      Student        @relation(fields: [studentId], references: [id])
+  examType     ExamType?
+  year         String
 
-  @@unique([classId, studentId, subjectId, examType])
-  @@map("subject_mark")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  subjectMarks SubjectMarks[]
+
+  @@map("student_result")
+}
+
+model SubjectMarks {
+  id              String        @id @default(uuid())
+  subjectId       String
+  subject         Subject       @relation(fields: [subjectId], references: [id])
+  fullMark        Int           @default(100)
+  obtainMark      Int
+  grade           String?
+  point           Float?        @default(0.00)
+  studentResultId String
+  studentResult   StudentResult @relation(fields: [studentResultId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("subject_marks")
 }
 
 enum ExamType {

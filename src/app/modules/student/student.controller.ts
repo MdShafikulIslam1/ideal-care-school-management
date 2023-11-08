@@ -46,20 +46,9 @@ const updateOne = catchAsync(async (req, res) => {
     data: result,
   });
 });
-const getMyResult = catchAsync(async (req, res) => {
-  const examType = pick(req?.query, ['examType']);
-  const result = await StudentService.getMyResult(req.user?.userId, examType);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Successfully Get a Student',
-    data: result,
-  });
-});
 export const StudentController = {
   getAll,
   getSingle,
   deleteOne,
   updateOne,
-  getMyResult,
 };

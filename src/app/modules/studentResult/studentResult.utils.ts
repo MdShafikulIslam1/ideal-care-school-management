@@ -47,19 +47,19 @@ export const getGradeFromMarks = (marks: number) => {
 export const getGradeFromPoint = (point: number) => {
   let result = '';
 
-  if (point === 0) {
+  if (point < 2.0) {
     result = 'F';
-  } else if (point === 2.0) {
+  } else if (point >= 2.0 && point < 2.5) {
     result = 'D';
-  } else if (point === 2.5) {
+  } else if (point >= 2.5 && point < 3.0) {
     result = 'C';
-  } else if (point === 3.0) {
+  } else if (point >= 3.0 && point < 3.5) {
     result = 'B';
-  } else if (point === 3.5) {
+  } else if (point >= 3.5 && point < 4.0) {
     result = 'A-';
-  } else if (point === 4.0) {
+  } else if (point >= 4.0 && point < 5.0) {
     result = 'A';
-  } else if (point === 5.0) {
+  } else if (point >= 5.0) {
     result = 'A+';
   }
 

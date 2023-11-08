@@ -15,3 +15,10 @@ export const studentSearchableFields = [
   'gender',
   'contactNo',
 ];
+export const studentResultFilterableFields = [
+  'searchTerm',
+  'classId',
+  'examType',
+  'year',
+];
+export const studentResultSearchableFields = ['classId', 'examType', 'year'];
